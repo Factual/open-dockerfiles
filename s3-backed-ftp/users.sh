@@ -20,7 +20,7 @@ for u in $USERS; do
   usermod -G ftpaccess $username
 
   # set the users password
-  echo $u | chpasswd
+  echo $u | chpasswd -e
   
   if [ -z "$username" ] || [ -z "$passwd" ]; then
     echo "Invalid username:password combination '$u': please fix to create '$username'"
