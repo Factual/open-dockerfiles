@@ -10,7 +10,7 @@ mkdir -p $FTP_DIRECTORY
 chown root:root $FTP_DIRECTORY
 chmod 755 $FTP_DIRECTORY
 
-# Expecing an environment variable called USERS to look like "bob:bobspassword steve:stevespassword"
+# Expecing an environment variable called USERS to look like "bob:hashedbobspassword steve:hashedstevespassword"
 for u in $USERS; do
   
   read username passwd <<< $(echo $u | sed 's/:/ /g')

@@ -5,6 +5,11 @@ if [ -z $BUCKET ]; then
   exit 1
 fi
 
+if [ -z $IAM_ROLE ]; then
+  echo "You need to set IAM_ROLE environment variable"
+  exit 1
+fi
+
 # Code to grab access key and secret access key from EC2 instances meta-data
 # This only works if the EC2 instance has been configured with attached IAM role
 
@@ -37,4 +42,4 @@ fi
 # start s3 fuse
 # Code above is not needed if the IAM role is attaced to EC2 instance 
 # s3fs provides the iam_role option to grab those credentials automatically
-/usr/local/bin/s3fs $BUCKET /home/aws/s3bucket -o allow_other -o mp_umask="0022" -o iam_role="" #-d -d -f -o f2 -o curldbg
+/usr/local/bin/s3fs $BUCKET /home/aws/s3bucket -o allow_other -o mp_umask="0022" -o iam_role="$IAM_ROLE" #-d -d -f -o f2 -o curldbg
