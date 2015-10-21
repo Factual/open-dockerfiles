@@ -15,13 +15,11 @@ To run:
   	- If the EC2 instance has an attached IAM role just add the roles name to s3-fuse.sh file
   		- Add role name to option ` -o iam_role="rolenamehere" `
   	- If there is no role account attached to EC2 instance (or not running in EC2) pass AWS access key and AWS secret access key as environment variables and uncomment lines [34](./s3-fuse.sh#L34) and [35](./s3-fuse.sh#L35) from s3-fuse.sh script
-2. Update vsftpd.conf file to add pasv_address of your ftp server
-	- Can also change the ports you want to allow passive ftp connections on by changing ` pasv_min_port ` and ` pasv_max_port `  
-3. Build the docker container using:
+2. Build the docker container using:
 
 	- ``` docker build --rm -t <docker/tag> path/to/dockerfile/folder ```
 
-4. Then after building the container, run using:
+3. Then after building the container, run using:
 
  	- ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list -P <docker/tag> ```
 	- If env.list file is named differently change accordingly. 
