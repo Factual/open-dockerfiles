@@ -27,4 +27,4 @@ ADD users.sh /etc/my_init.d/002-users.sh
 
 RUN echo "/usr/sbin/nologin" >> /etc/shells
 
-EXPOSE 21 22
+EXPOSE 21 22 1024-1048
