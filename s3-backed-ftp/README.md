@@ -7,20 +7,37 @@ An ftp/sftp server using s3fs to mount an external s3 bucket as ftp/sftp storage
 To run:
 
 1. First replace env.list.example file with a real env.list file with correct variables filled in.
-	- Add users to USERS env variable in the format ` user:hashedpassword user2:hashedpassword2 ` with a space separating each user:pass combination
+	- Add users to USERS environment variable
   	- May also use non-hashed passwords if storing passwords in plaintext is fine.
-  	- Just change line ` echo $u | chpasswd -e ` -> ` echo $u | chpasswd `
-  	- New users env variable will look like ` user:password1 user2:password2 `
-	- AWS keys are now fetched from the EC2 instance currently running the docker container
-  	- If the EC2 instance has an attached IAM role just add the roles name to s3-fuse.sh file
-  		- Add role name to option ` -o iam_role="rolenamehere" `
-  	- If there is no role account attached to EC2 instance (or not running in EC2) pass AWS access key and AWS secret access key as environment variables and uncomment lines [34](./s3-fuse.sh#L34) and [35](./s3-fuse.sh#L35) from s3-fuse.sh script
+  		- Change line ` echo $u | chpasswd -e ` -> ` echo $u | chpasswd ` to use plaintext
+	- AWS keys are now fetched from the EC2 instance currently running the docker container  
+	
 2. Build the docker container using:
 
 	- ``` docker build --rm -t <docker/tag> path/to/dockerfile/folder ```
 
 3. Then after building the container, run using:
 
- 	- ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list -P <docker/tag> ```
+ 	- ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1048:1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list -P <docker/tag> ```
 	- If env.list file is named differently change accordingly. 
+	- If you don't want to use the cap-add and device options you could also just use the privileged option instead:
+		* ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1024:1024-1048 --privileged --env-file env.list -P <docker/tag> ```
+	
+## Environment Variables
+
+1. ` USERS ` = List of users to add to the ftp/sftp server. Listed in the form username:hashedpassword, each separated by a space
+2. ` FTP_BUCKET ` = S3 bucket where ftp/sftp users data will be stored
+3. ` CONFIG_BUCKET ` = S3 bucket where the config data will be stored
+4. ` IAM_ROLE ` = name of role account linked to EC2 instance the container is running in
+
+
+## Optional Environment Variables
+These two environment variables only need to be set if there is no linked IAM role to the EC2 instance.
+
+1. ` AWS_ACCESS_KEY_ID ` = IAM user account access key
+2. ` AWS_SECRET_ACCESS_KEY ` = IAM user account secret access key
+
+Set theses environment variables and uncomment lines [28-36](./s3-fuse.sh#L28-36), [39](./s3-fuse.sh#L34), and [40](./s3-fuse.sh#L35) from s3-fuse.sh script
+
+
 
