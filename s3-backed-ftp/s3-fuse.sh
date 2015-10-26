@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z $BUCKET ]; then
+if [ -z $FTP_BUCKET ]; then
   echo "You need to set BUCKET environment variable"
   exit 1
 fi
@@ -24,7 +24,6 @@ fi
 # 
 # # If they are still not set here, there was an error retreiving the keys from the instances meta-data
 # # Or the instance was not configured with the appropriate IAM role account 
-# # Check to make sure they are set in environment variables
 # if [ -z $AWS_ACCESS_KEY_ID ]; then
 #   echo "You need to set AWS_ACCESS_KEY_ID environment variable"
 #   exit 1
