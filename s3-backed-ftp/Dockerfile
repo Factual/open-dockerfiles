@@ -1,10 +1,8 @@
 FROM factual/docker-base
 
 RUN apt-get -y clean
-RUN apt-get -y update
-RUN apt-get -y install automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config 
-RUN sudo apt-get -y install vsftpd openssh-server
-
+RUN apt-get -y update && apt-get -y install automake autotools-dev g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config python3-pip vsftpd openssh-server
+RUN pip3 install awscli
 
 RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
     cd s3fs-fuse && \
