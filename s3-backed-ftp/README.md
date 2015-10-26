@@ -18,10 +18,12 @@ To run:
 
 3. Then after building the container, run using:
 
- 	- ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1048:1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list -P <docker/tag> ```
+ 	- ``` docker run --rm -p 21:21 -p 222:22 -p 1024-1048:1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list  <docker/tag> ```
+  - If you would like the docker to restart after reboot then use:
+    * ``` docker run --restart=always -p 21:21 -p 222:22 -p 1024-1048:1024-1048 --name <name> --cap-add SYS_ADMIN --device /dev/fuse --env-file env.list <docker/tag> ```
 	- If env.list file is named differently change accordingly. 
 	- If you don't want to use the cap-add and device options you could also just use the privileged option instead:
-		* ``` docker run --rm -p 21:21 -p 22:22 -p 1024-1024:1024-1048 --privileged --env-file env.list -P <docker/tag> ```
+		* ``` docker run --rm -p 21:21 -p 222:22 -p 1024-1024:1024-1048 --privileged --env-file env.list <docker/tag> ```
 	
 ## Environment Variables
 
@@ -38,6 +40,3 @@ These two environment variables only need to be set if there is no linked IAM ro
 2. ` AWS_SECRET_ACCESS_KEY ` = IAM user account secret access key
 
 Set theses environment variables and uncomment lines [28-36](./s3-fuse.sh#L28-36), [39](./s3-fuse.sh#L34), and [40](./s3-fuse.sh#L35) from s3-fuse.sh script
-
-
-
