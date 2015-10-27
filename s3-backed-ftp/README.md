@@ -9,7 +9,7 @@ To run:
 1. First replace env.list.example file with a real env.list file with correct variables filled in.
 	- Add users to USERS environment variable
   	- May also use non-hashed passwords if storing passwords in plaintext is fine.
-  		- Change line ` echo $u | chpasswd -e ` -> ` echo $u | chpasswd ` to use plaintext
+  		- Change line ` echo $u | chpasswd -e ` => ` echo $u | chpasswd ` to use plaintext
 	- AWS keys are now fetched from the EC2 instance currently running the docker container  
 	
 2. Build the docker container using:
