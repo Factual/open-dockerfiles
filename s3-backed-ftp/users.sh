@@ -5,6 +5,7 @@ FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 # Create a group for ftp users
 groupadd ftpaccess
 
+
 # Create a directory where all ftp/sftp users home directories will go
 mkdir -p $FTP_DIRECTORY
 chown root:root $FTP_DIRECTORY
@@ -43,12 +44,12 @@ for u in $USERS; do
   
 done
 
-echo "Starting sftp..."
-
-service ssh restart
-
-echo "sftp started, starting vsftpd..."
-
-/usr/sbin/vsftpd
-
-echo "If you see this, vsftpd didn't start correctly"
+# echo "Starting sftp..."
+# 
+# service ssh restart
+# 
+# echo "sftp started, starting vsftpd..."
+# 
+# /usr/sbin/vsftpd
+# 
+# echo "If you see this, vsftpd didn't start correctly"
