@@ -23,6 +23,8 @@ ADD sshd_config /etc/ssh/sshd_config
 
 ADD users.sh /usr/local
 
+ADD add_users.sh /usr/local/
+
 RUN echo "/usr/sbin/nologin" >> /etc/shells
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
