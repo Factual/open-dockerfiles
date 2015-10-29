@@ -21,7 +21,7 @@ RUN chown root:root /etc/vsftpd.conf
 
 ADD sshd_config /etc/ssh/sshd_config
 
-ADD users.sh /usr/local
+ADD users.sh /usr/local/
 
 ADD add_users.sh /usr/local/
 
