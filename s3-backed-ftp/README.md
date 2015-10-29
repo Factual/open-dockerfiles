@@ -29,7 +29,7 @@ To run:
 
 1. ` USERS ` = List of users to add to the ftp/sftp server. Listed in the form username:hashedpassword, each separated by a space
 2. ` FTP_BUCKET ` = S3 bucket where ftp/sftp users data will be stored
-3. ` CONFIG_BUCKET ` = S3 bucket where the config data will be stored
+3. ` CONFIG_BUCKET ` = S3 bucket where the config data (env.list file) will be stored 
 4. ` IAM_ROLE ` = name of role account linked to EC2 instance the container is running in
 
 
