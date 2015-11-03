@@ -23,7 +23,7 @@ ADD sshd_config /etc/ssh/sshd_config
 
 ADD users.sh /usr/local/
 
-ADD add_users.sh /usr/local/
+ADD add_users_in_container.sh /usr/local/
 
 RUN echo "/usr/sbin/nologin" >> /etc/shells
 
