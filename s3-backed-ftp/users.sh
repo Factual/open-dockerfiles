@@ -43,13 +43,3 @@ for u in $USERS; do
   fi
   
 done
-
-# echo "Starting sftp..."
-# 
-# service ssh restart
-# 
-# echo "sftp started, starting vsftpd..."
-# 
-# /usr/sbin/vsftpd
-# 
-# echo "If you see this, vsftpd didn't start correctly"
