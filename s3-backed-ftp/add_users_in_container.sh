@@ -4,7 +4,7 @@
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 CONFIG_FILE="env.list" # May need to modify config file name to reflect future changes in env file location/name
-SLEEP_DURATION=4h
+SLEEP_DURATION=60
 
 add_users() {
   aws s3 cp s3://$CONFIG_BUCKET/$CONFIG_FILE ~/$CONFIG_FILE
@@ -12,12 +12,13 @@ add_users() {
 
   for u in $USERS; do
     read username passwd <<< $(echo $u | sed 's/:/ /g')
+    
+    # Moved outside directory test so users passwords will always be set (incase they are changed in env file)
+    echo $u | chpasswd -e
 
     if [ ! -d "$FTP_DIRECTORY/$username" ]; then
        useradd -d "$FTP_DIRECTORY/$username" -s /usr/sbin/nologin $username
        usermod -G ftpaccess $username
-
-       echo $u | chpasswd -e
 
        mkdir -p "$FTP_DIRECTORY/$username"
        chown root:ftpaccess "$FTP_DIRECTORY/$username"
