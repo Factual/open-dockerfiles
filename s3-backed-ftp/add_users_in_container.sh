@@ -29,7 +29,7 @@ add_users() {
        chmod 750 "$FTP_DIRECTORY/$username/files"
      fi
    done
- }
+}
 
  while true; do
    add_users
