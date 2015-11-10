@@ -12,11 +12,16 @@ add_users() {
 
   for u in $USERS; do
     read username passwd <<< $(echo $u | sed 's/:/ /g')
-    
-    # Moved outside directory test so users passwords will always be set (incase they are changed in env file)
-    echo $u | chpasswd -e
 
-    if [ ! -d "$FTP_DIRECTORY/$username" ]; then
+    # If account exists set password again 
+    # In cases where password changes in env file
+    if getent passwd "$username" >/dev/null 2>&1; then
+      echo $u | chpasswd -e
+    fi
+
+    # If user account doesn't exist create it 
+    # As well as their home directory 
+    if ! getent passwd "$username" >/dev/null 2>&1; then
        useradd -d "$FTP_DIRECTORY/$username" -s /usr/sbin/nologin $username
        usermod -G ftpaccess $username
 
