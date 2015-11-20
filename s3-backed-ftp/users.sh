@@ -28,6 +28,12 @@ for u in $USERS; do
     continue
   elif [ -d "$FTP_DIRECTORY/$username" ]; then
     echo "Skipping creation of '$username' directory: already exists"
+
+    # Directory exists but permissions for it have to be setup anyway.
+    chown root:ftpaccess "$FTP_DIRECTORY/$username"
+    chmod 750 "$FTP_DIRECTORY/$username"
+    chown $username:ftpaccess "$FTP_DIRECTORY/$username/files"
+    chmod 750 "$FTP_DIRECTORY/$username/files"
   else
     echo "Creating '$username' directory..."
     
