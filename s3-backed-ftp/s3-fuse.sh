@@ -1,42 +1,34 @@
 #!/bin/bash
 
+# Check first if the required FTP_BUCKET variable was provided, if not, abort.
 if [ -z $FTP_BUCKET ]; then
-  echo "You need to set BUCKET environment variable"
+  echo "You need to set BUCKET environment variable. Aborting!"
   exit 1
 fi
 
+# Then check if there is an IAM_ROLE provided, if not, check if the AWS credentials were provided.
 if [ -z $IAM_ROLE ]; then
-  echo "You need to set IAM_ROLE environment variable"
+  echo "You did not set an IAM_ROLE environment variable. Checking if AWS access keys where provided ..."
+fi
+
+# Abort if the AWS_ACCESS_KEY_ID was not provided if an IAM_ROLE was not provided neither.
+if [ -z $IAM_ROLE ] &&  [ -z $AWS_ACCESS_KEY_ID ]; then
+  echo "You need to set AWS_ACCESS_KEY_ID environment variable. Aborting!"
   exit 1
 fi
 
-# Code to grab access key and secret access key from EC2 instances meta-data
-# This only works if the EC2 instance has been configured with attached IAM role
+# Abort if the AWS_SECRET_ACCESS_KEY was not provided if an IAM_ROLE was not provided neither. 
+if [ -z $IAM_ROLE ] && [ -z $AWS_SECRET_ACCESS_KEY ]; then
+  echo "You need to set AWS_SECRET_ACCESS_KEY environment variable. Aborting!"
+  exit 1
+fi
 
-# if ! curl -s http://169.254.169.254/latest/meta-data/iam/security-credentials/ | grep -q 404; then
-#   instance_profile=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/)
-# 
-#   AWS_ACCESS_KEY_ID=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/${instance_profile} | grep AccessKeyId | cut -d':' -f2 | sed 's/[^0-9A-Z]*//g')
-#   AWS_SECRET_ACCESS_KEY=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/${instance_profile} | grep SecretAccessKey | cut -d':' -f2 | sed 's/[^0-9A-Za-z/+=]*//g')
-# else
-#   "IAM Role account not linked to current EC2 instance, looking for credentials in environment variables instead..."
-# fi
-# 
-# # If they are still not set here, there was an error retreiving the keys from the instances meta-data
-# # Or the instance was not configured with the appropriate IAM role account 
-# if [ -z $AWS_ACCESS_KEY_ID ]; then
-#   echo "You need to set AWS_ACCESS_KEY_ID environment variable"
-#   exit 1
-# fi
-# 
-# if [ -z $AWS_SECRET_ACCESS_KEY ]; then
-#   echo "You need to set AWS_SECRET_ACCESS_KEY environment variable"
-#   exit 1
-# fi
-
-#set the aws access credentials from environment variables
-# echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY > ~/.passwd-s3fs
-# chmod 600 ~/.passwd-s3fs
+# If there is no IAM_ROLE but the AWS credentials were provided, then set them as the s3fs credentials.
+if [ -z $IAM_ROLE ] && [ ! -z $AWS_ACCESS_KEY_ID ] && [ ! -z $AWS_SECRET_ACCESS_KEY ]; then
+  #set the aws access credentials from environment variables
+  echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY > ~/.passwd-s3fs
+  chmod 600 ~/.passwd-s3fs
+fi
 
 # start s3 fuse
 # Code above is not needed if the IAM role is attaced to EC2 instance 
