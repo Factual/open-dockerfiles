@@ -19,8 +19,16 @@ docker run --restart=always --name bind9 -e -e URL="https://my-config-files.fact
 
 ## Environment Variables
 
+### Github Sync
+  
 - GITHUB_REPO
 - GITHUB_SSH_KEY 
 - GIT_PATH
+
+### URL Sync
+
 - URL
+
+### Common
+
 - REFRESH (default: 300)
