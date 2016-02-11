@@ -20,10 +20,17 @@ function get_updates() {
 }
 
 function sync_and_reload() {
-  rsync -arz --delete-after /conf/pending/$GIT_PATH/* /conf/active/
-  ls -r /conf/active
-  ls -r /etc/bind
-  rndc reload
+  mv /conf/active /conf/backup
+  mkdir -p /conf/active
+  cp -r /conf/pending/$GIT_PATH/* /conf/active/
+  echo "Validating config and reloading..."
+  if config_valid; then
+    echo "Config valid.  Reloading..."
+    rndc reload
+  else
+    echo "Config NOT valid.  Reverting..."
+    mv /conf/backup /conf/active
+  fi
 }
 
 function get_updates_from_github() {
@@ -38,6 +45,9 @@ function get_updates_from_github() {
   fi
 }
 
+function config_valid() {
+  named-checkconf -z /etc/bind/named.conf
+}
 
 function get_updates_from_url() {
   wget -nd -r -nc -np -e robots=off -R "index.html*" $URL
@@ -47,6 +57,8 @@ function get_updates_from_url() {
     return 1
   fi
 }
+
+sleep 20
 
 while true; do
   cd /conf/pending/

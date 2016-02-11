@@ -35,5 +35,7 @@ function prepare_once_url() {
 echo "Initializing..."
 prepare_once && echo "Done with initialization."
 
+/ext_sync.sh &
+
 echo "Starting named"
 /usr/sbin/named -g -c /etc/bind/named.conf -u bind
