@@ -16,4 +16,4 @@ ADD ext_sync.sh /
 
 VOLUME ["/conf"]
 
-EXPOSE 53 953
+EXPOSE 53 53/udp 953
