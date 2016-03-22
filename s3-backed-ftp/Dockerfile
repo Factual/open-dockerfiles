@@ -1,10 +1,11 @@
 FROM factual/docker-base
 
+# Install needed packages and cleanup after
 RUN apt-get -y update && apt-get -y install --no-install-recommends \
  automake \
  autotools-dev \
- g++ \ 
- git \ 
+ g++ \
+ git \
  libcurl4-gnutls-dev \
  libfuse-dev \
  libssl-dev \
@@ -16,34 +17,28 @@ RUN apt-get -y update && apt-get -y install --no-install-recommends \
  openssh-server \
  supervisor \
  && rm -rf /var/lib/apt/lists/*
- 
-RUN pip3 install awscli
 
-RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
-    cd s3fs-fuse && \
-    ./autogen.sh && \
-    ./configure  && \ 
-    make && \
-    sudo make install
+# Run commands to set-up everything
+RUN pip3 install awscli && \
+  git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
+  cd s3fs-fuse && \
+  ./autogen.sh && \
+  ./configure  && \
+  make && \
+  sudo make install && \
+  mkdir -p /home/aws/s3bucket/ && \
+  echo "/usr/sbin/nologin" >> /etc/shells
 
-RUN mkdir -p /home/aws/s3bucket/
+# Copy scripts to /usr/local
+COPY ["s3-fuse.sh", "users.sh", "add_users_in_container.sh", "/usr/local/"]
 
-ADD s3-fuse.sh /usr/local/
-
-ADD vsftpd.conf /etc/vsftpd.conf
-
-RUN chown root:root /etc/vsftpd.conf
-
-ADD sshd_config /etc/ssh/sshd_config
-
-ADD users.sh /usr/local/
-
-ADD add_users_in_container.sh /usr/local/
-
-RUN echo "/usr/sbin/nologin" >> /etc/shells
-
+# Copy needed config files to their destinations
+COPY vsftpd.conf /etc/vsftpd.conf
+COPY sshd_config /etc/ssh/sshd_config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 21 22 
+# Expose ftp and sftp ports
+EXPOSE 21 22
 
+# Run supervisord at container start
 CMD ["/usr/bin/supervisord"]
