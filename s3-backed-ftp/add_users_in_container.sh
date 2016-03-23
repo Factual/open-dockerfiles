@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script will update the env.list file (file containing USERS environrment variable) and add the new users if there are any.
-set -x
+set -ex
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 CONFIG_FILE="env.list" # May need to modify config file name to reflect future changes in env file location/name
