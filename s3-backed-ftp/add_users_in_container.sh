@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script will update the env.list file (file containing USERS environrment variable) and add the new users if there are any.
-set -ex
+set -x
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 CONFIG_FILE="env.list" # May need to modify config file name to reflect future changes in env file location/name
@@ -28,13 +28,13 @@ add_users() {
       # This would not allow ftp users to read the files
 
       # Search for files and directories not owned correctly
-      find "$FTP_DIRECTORY/$username/files"/* \( \! -user "$username" \! -group "$username" \) -print0 | xargs -0 chown "$username:$username"
+      find "$FTP_DIRECTORY/$username/files/*" \( \! -user "$username" \! -group "$username" \) -print0 | xargs -0 chown "$username:$username"
 
       # Search for files with incorrect permissions
-      find "$FTP_DIRECTORY/$username/files"/* -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 chmod "$FILE_PERMISSIONS"
+      find "$FTP_DIRECTORY/$username/files/*" -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 chmod "$FILE_PERMISSIONS"
 
       # Search for directories with incorrect permissions
-      find "$FTP_DIRECTORY/$username/files"/* -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 chmod "$DIRECTORY_PERMISSIONS"
+      find "$FTP_DIRECTORY/$username/files/*" -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 chmod "$DIRECTORY_PERMISSIONS"
 
     fi
 
