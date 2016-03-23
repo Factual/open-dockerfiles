@@ -28,13 +28,13 @@ add_users() {
       # This would not allow ftp users to read the files
 
       # Search for files and directories not owned correctly
-      find "$FTP_DIRECTORY/$username/files/*" \( \! -user "$username" \! -group "$username" \) -print0 | xargs -0 chown "$username:$username"
+      find "$FTP_DIRECTORY/$username/files/" -mindepth 1 \( \! -user "$username" \! -group "$username" \) -print0 | xargs -0 chown "$username:$username"
 
       # Search for files with incorrect permissions
-      find "$FTP_DIRECTORY/$username/files/*" -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 chmod "$FILE_PERMISSIONS"
+      find "$FTP_DIRECTORY/$username/files/" -mindepth 1 -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 chmod "$FILE_PERMISSIONS"
 
       # Search for directories with incorrect permissions
-      find "$FTP_DIRECTORY/$username/files/*" -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 chmod "$DIRECTORY_PERMISSIONS"
+      find "$FTP_DIRECTORY/$username/files/" -mindepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 chmod "$DIRECTORY_PERMISSIONS"
 
     fi
 
