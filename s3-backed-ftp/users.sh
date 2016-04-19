@@ -38,8 +38,10 @@ for u in $USERS; do
     # Create .ssh folder and authorized_keys file, for ssh-key sftp access
     mkdir -p "$FTP_DIRECTORY/$username/.ssh"
     chmod 700 "$FTP_DIRECTORY/$username/.ssh"
+    chown $username "$FTP_DIRECTORY/$username/.ssh"
     touch "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
     chmod 600 "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
+    chown $username "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
 
   else
     echo "Creating '$username' directory..."
