@@ -13,7 +13,7 @@ chmod 755 $FTP_DIRECTORY
 
 # Expecing an environment variable called USERS to look like "bob:hashedbobspassword steve:hashedstevespassword"
 for u in $USERS; do
-  
+
   read username passwd <<< $(echo $u | sed 's/:/ /g')
 
   # User needs to be created every time since stopping the docker container gets rid of users.
@@ -22,7 +22,7 @@ for u in $USERS; do
 
   # set the users password
   echo $u | chpasswd -e
-  
+
   if [ -z "$username" ] || [ -z "$passwd" ]; then
     echo "Invalid username:password combination '$u': please fix to create '$username'"
     continue
@@ -34,18 +34,25 @@ for u in $USERS; do
     chmod 750 "$FTP_DIRECTORY/$username"
     chown $username:ftpaccess "$FTP_DIRECTORY/$username/files"
     chmod 750 "$FTP_DIRECTORY/$username/files"
+
+    # Create .ssh folder and authorized_keys file, for ssh-key sftp access
+    mkdir -p "$FTP_DIRECTORY/$username/.ssh"
+    chmod 700 "$FTP_DIRECTORY/$username/.ssh"
+    touch "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
+    chmod 600 "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
+
   else
     echo "Creating '$username' directory..."
-    
+
     # Root must own all directories leading up to and including users home directory
     mkdir -p "$FTP_DIRECTORY/$username"
     chown root:ftpaccess "$FTP_DIRECTORY/$username"
     chmod 750 "$FTP_DIRECTORY/$username"
-    
+
     # Need files sub-directory for SFTP chroot
     mkdir -p "$FTP_DIRECTORY/$username/files"
     chown $username:ftpaccess "$FTP_DIRECTORY/$username/files"
     chmod 750 "$FTP_DIRECTORY/$username/files"
   fi
-  
+
 done

@@ -35,11 +35,6 @@ add_users() {
       # Search for directories with incorrect permissions
       find "$FTP_DIRECTORY/$username/files/" -mindepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
 
-      # Setup correct permissions on .ssh folder and authorized_keys file for ssh-key sftp access
-      find "$FTP_DIRECTORY/$username/.ssh/" -mindepth 1 -type d \! -perm  700 -print0 | xargs -0 -r chmod 700
-
-      find "$FTP_DIRECTORY/$username/.ssh/authorized_keys" -mindepth 1 -type f \! -perm  600 -print0 | xargs -0 -r chmod 600
-
     fi
 
     # If user account doesn't exist create it
