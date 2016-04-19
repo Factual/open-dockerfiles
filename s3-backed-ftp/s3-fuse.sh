@@ -32,8 +32,8 @@ fi
 
 if [ ! -z $PASV_ADDRESS ]; then
   sed -i "s/^pasv_address=/pasv_address=$PASV_ADDRESS/" /etc/vsftpd.conf
-elif curl -s http://instance-data.ec2.internal > /dev/null ; then
-  IP=$(curl -s http://instance-data.ec2.internal/latest/meta-data/public-ipv4)
+elif curl -s http://instance-data > /dev/null ; then
+  IP=$(curl -s http://instance-data/latest/meta-data/public-ipv4)
   sed -i "s/^pasv_address=/pasv_address=$IP/" /etc/vsftpd.conf
 else
   echo "You need to set PASV_ADDRESS environment variable, or run in an EC2 instance. Aborting!"
