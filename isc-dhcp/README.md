@@ -7,12 +7,12 @@ If checking out from Github you can perform a sparse checkout of the repo by sup
 # Running
 ## Github checkout Example
 ```
-docker run --restart=always --name bind9 -e GITHUB_REPO="git@github.com:Factual/some-repo-where-we-keep-configs.git" -e GITHUB_SSH_KEY="`cat ~/.ssh/my_deploy_key`" -e GIT_PATH="/isc-dhcp" -e REFRESH=300 factual/isc-dhcp
+docker run --restart=always --name isc-dhcp -e GITHUB_REPO="git@github.com:Factual/some-repo-where-we-keep-configs.git" -e GITHUB_SSH_KEY="`cat ~/.ssh/my_deploy_key`" -e GIT_PATH="/isc-dhcp" -e REFRESH=300 factual/isc-dhcp
 ```
 
 ## URL Example
 ```
-docker run --restart=always --name bind9 -e URL="https://my-config-files.factual.com/services/bind9/" -e REFRESH=300 factual/isc-dhcp
+docker run --restart=always --name isc-dhcp -e URL="https://my-config-files.factual.com/services/isc-dhcp/" -e REFRESH=300 factual/isc-dhcp
 ```
 
 # Env Variables
