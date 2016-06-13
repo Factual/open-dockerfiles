@@ -3,6 +3,7 @@
 set -e
 
 GIT_BRANCH="${GIT_BRANCH:-master}"
+INTERFACES="${INTERFACES:-"eth0"}"
 
 function prepare_once() {
   mkdir -p /conf/active/
@@ -41,6 +42,7 @@ function prepare_one_url() {
 }
 
 echo "Initializing..."
+sed -i "s/INTERFACES=\"\"/INTERFACES=\"$INTERFACES\"/g" /etc/default/isc-dhcp-server && echo -e "\nSetting interfaces to: $INTERFACES\n"
 [[ -z "$GIT_PATH" ]] && echo "GIT_PATH not set...checking out whole git repo"
 [[ ! -z "$GIT_PATH" ]] && echo "GIT_PATH set...checking out directory $GIT_PATH in $GITHUB_REPO"
 prepare_once && echo "Done with initialization"
