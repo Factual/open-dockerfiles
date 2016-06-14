@@ -2,9 +2,9 @@
 
 This image will fetch all dhcp config files from github or a url path and reload when it detects changes.
 
-If checking out from Github you can perform a sparse checkout of the repo by supplying a "GIT_PATH" environment variable. This will be the directory checked out from the Github repo.
+If checking out from Github you can perform a sparse checkout of the repo by supplying a `GIT_PATH` environment variable. This will be the directory checked out from the Github repo.
 
-If you want to specify an interface besides `eth0` or in addition to `eth0` set the "INTERFACES" environmnet variable to all the interfaces you want the server to listen on. The "INTERFACES" variable should be a space separated list of interface names.
+If you want to specify an interface besides `eth0` or in addition to `eth0` set the `INTERFACES` environmnet variable to all the interfaces you want the server to listen on. The `INTERFACES` variable should be a space separated list of interface names.
 
 # Running
 ## Github checkout Example

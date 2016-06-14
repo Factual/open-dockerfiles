@@ -3,7 +3,7 @@
 set -e
 
 GIT_BRANCH="${GIT_BRANCH:-master}"
-INTERFACES="${INTERFACES:-"eth0"}"
+INTERFACES="${INTERFACES:-eth0}"
 
 function prepare_once() {
   mkdir -p /conf/active/
