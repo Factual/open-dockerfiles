@@ -46,8 +46,5 @@ sed -i "s/INTERFACES=\"\"/INTERFACES=\"$INTERFACES\"/g" /etc/default/isc-dhcp-se
 [[ -z "$GIT_PATH" ]] && echo "GIT_PATH not set...checking out whole git repo"
 [[ ! -z "$GIT_PATH" ]] && echo "GIT_PATH set...checking out directory $GIT_PATH in $GITHUB_REPO"
 prepare_once && echo "Done with initialization"
-
 chown -R dhcpd:dhcpd /etc/dhcp
-echo "Starting isc-dhcp"
-/usr/sbin/dhcpd -f -cf /etc/dhcp/dhcpd.conf -lf /var/lib/dhcp/dhcpd.leases --no-pid
 
