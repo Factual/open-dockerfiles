@@ -4,7 +4,7 @@ This image will fetch all dhcp config files from github or a url path and reload
 
 If checking out from Github you can perform a sparse checkout of the repo by supplying a `GIT_PATH` environment variable. This will be the directory checked out from the Github repo.
 
-If you want to specify an interface besides `eth0` or in addition to `eth0` set the `INTERFACES` environmnet variable to all the interfaces you want the server to listen on. The `INTERFACES` variable should be a space separated list of interface names.
+If you want to specify an interface besides `eth0` set the `INTERFACE` environmnet variable to the interface you want the server to listen on and it will only listen on the given interface. Otherwise it will listen on all available interfaces.
 
 # Running
 ## Github checkout Example
@@ -30,4 +30,4 @@ docker run --restart=always --name isc-dhcp -e URL="https://my-config-files.fact
 
 ### Common
   - REFRESH (default: 300)
-  - INTERFACES (default: eth0)
+  - INTERFACE (default: eth0)

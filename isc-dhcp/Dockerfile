@@ -6,7 +6,7 @@ RUN DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y -q git-core wget isc-dhcp-server
 
 COPY ssh_config /root/.ssh/config
-COPY setup_isc_dhcp.sh /etc/my_init.d/99_isc-dhcp
+COPY run_isc_dhcp.sh /etc/my_init.d/99_isc-dhcp
 COPY ext_sync.sh /etc/service/isc-dhcp-sync/run
 
 # Remove sample dhcp config directory/files
@@ -25,5 +25,5 @@ EXPOSE 647
 # DHCP failover protocol
 EXPOSE 847
 
-CMD [ "/sbin/my_init", "--", "/usr/sbin/dhcpd", "-f", "-cf", "/etc/dhcp/dhcpd.conf", "-lf", "/var/lib/dhcp/dhcpd.leases", "--no-pid" ]
+CMD [ "/sbin/my_init" ]
 
