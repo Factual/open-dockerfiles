@@ -29,9 +29,11 @@ function sync_and_reload() {
   if config_valid; then
     echo "Config valid. Reloading..."
     /etc/init.d/isc-dhcp-server restart
+    rm -r /conf/backup
   else
     echo "Config NOT valid. Reverting..."
-    mv /conf/backup /conf/active
+    mv /conf/backup/* /conf/active
+    rm -r /conf/backup
   fi
 }
 
