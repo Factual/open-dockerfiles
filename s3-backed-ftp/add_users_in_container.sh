@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # This script will update the env.list file (file containing USERS environrment variable) and add the new users if there are any.
 set -euo pipefail
-IFS=$'\n\t'
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 CONFIG_FILE="env.list" # May need to modify config file name to reflect future changes in env file location/name
+FTP_GROUP=${FTP_GROUP:-"ftpaccess"}
 
 SLEEP_DURATION=${SLEEP_DURATION:-60}
-DIRECTORY_PERMISSIONS=${DIRECTORY_PERMISSIONS:-750}
-FILE_PERMISSIONS=${FILE_PERMISSIONS:-644}
+DIR_PERMISSIONS=${DIR_PERMISSIONS:-755}
+FILE_PERMISSIONS=${FILE_PERMISSIONS:-640}
 
 readonly LOG_FILE="/var/log/$(basename "$0").log"
 info()    { echo "[INFO]    $*" | tee -a "$LOG_FILE" >&2 ; }
@@ -21,44 +21,29 @@ fix_permissions() {
   # 000 root:root
   # This would not allow ftp users to read the files
 
-  warning "Fixing permissions for $1"
+  find "$FTP_DIRECTORY/$1/files/" -type f \( -perm 000 -o ! -perm "$FILE_PERMISSIONS" \) -exec chmod "$FILE_PERMISSIONS" {} \+ \
+    || warning "Failed to chmod one of $1's files"
+  find "$FTP_DIRECTORY/$1/files/" -type d \( -perm 000 -o ! -perm "$DIR_PERMISSIONS" \) -exec chmod "$DIR_PERMISSIONS" {} \+ \
+    || warning "Failed to chown one of $1's directories"
 
-  find "$FTP_DIRECTORY/$1/files/" -type f -perm 000 -exec chmod "$FILE_PERMISSIONS" {} \;
-  find "$FTP_DIRECTORY/$1/files/" -type d -perm 000 -exec chmod "$DIRECTORY_PERMISSIONS" {} \;
-  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \! -user "$1" -exec chown "$1:$1" {} +;
-  # Search for files and directories not owned correctly
-  #find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \( \! -user "$1" \! -group "$1" \) -print0 | xargs -0 -r chown "$1:$1"
-
-  # Search for files with incorrect permissions
-  # find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 -r chmod "$FILE_PERMISSIONS"
-
-  # Search for directories with incorrect permissions
-  # find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
-  # find "$FTP_DIRECTORY/$1/files/" -maxdepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
-
-  # Search for .ssh folders and authorized_keys files with incorrect permissions/ownership
-  # find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -perm 700 -print0 | xargs -0 -r chmod 700
-  # find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -user "$1" -print0 | xargs -0 -r chown "$1"
-
-  # find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -perm 600 -print0 | xargs -0 -r chmod 600
-  # find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -user "$1" -print0 | xargs -0 -r chown "$1"
+  # Don't chown the $1/files directory because it has different owner than the others
+  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \! -user "$1" -exec chown "$1:$1" {} \+ \
+    || warning "Failed to chown one of $1's files"
 }
 
 create_user() {
   info "Creating user $1"
 
-  adduser -d "$FTP_DIRECTORY/$username" -s /sbin/nologin "$username"
-  addgroup "$username" ftpaccess
-  # useradd -d "$FTP_DIRECTORY/$1" -s /usr/sbin/nologin "$1"
-  # usermod -G ftpaccess "$1"
+  adduser -D -h "$FTP_DIRECTORY/$username" -s "/sbin/nologin" "$username" || fatal "Failed to create $username"
+  adduser "$username" "$FTP_GROUP" || fatal "Failed to add $username to $FTP_GROUP group"
 
   mkdir -p "$FTP_DIRECTORY/$1"
   chown root:ftpaccess "$FTP_DIRECTORY/$1"
-  chmod 750 "$FTP_DIRECTORY/$1"
+  chmod "$DIR_PERMISSIONS" "$FTP_DIRECTORY/$1"
 
   mkdir -p "$FTP_DIRECTORY/$1/files"
   chown "$1:ftpaccess" "$FTP_DIRECTORY/$1/files"
-  chmod 750 "$FTP_DIRECTORY/$1/files"
+  chmod "$DIR_PERMISSIONS" "$FTP_DIRECTORY/$1/files"
 
   # Create .ssh folder and authorized_keys file, for ssh-key sftp access
   mkdir -p "$FTP_DIRECTORY/$1/.ssh"
@@ -72,7 +57,7 @@ create_user() {
 
 add_users() {
   aws s3 cp "s3://$CONFIG_BUCKET/$CONFIG_FILE" "$HOME/$CONFIG_FILE"
-  USERS=$(grep USERS "$HOME/CONFIG_FILE" | cut -d '=' -f2)
+  USERS=$(grep USERS "$HOME/$CONFIG_FILE" | cut -d '=' -f2)
 
   for u in $USERS; do
     read -r username _ <<< "${u//:/ }"
@@ -82,10 +67,8 @@ add_users() {
     if getent passwd "$username" >/dev/null 2>&1; then
       echo "$u" | chpasswd -e
       fix_permissions "$username"
-    fi
-
-    # If user account doesn't exist create it
-    if ! getent passwd "$username" >/dev/null 2>&1; then
+    else
+      # If user account doesn't exist create it
       create_user "$username"
     fi
   done

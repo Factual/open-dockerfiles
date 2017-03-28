@@ -17,7 +17,7 @@ To run:
     ```
    - `FTP_BUCKET` is the bucket you want to mount
    - `CONFIG_BUCKET` is the bucket where your `env.list` file will live in S3
-   - Give an `IAM_ROLE`, if running on EC2 with an attached role, or AWS keys 
+   - Give an `IAM_ROLE`, if running on EC2 with an attached role, or AWS keys
 
 2. Build the image
     ```bash
@@ -26,7 +26,7 @@ To run:
 
 3. Run the container
     > Make sure you have `fuse` installed since the `run` command depends on the device `/dev/fuse`
-    
+
     ```
     make run
     ```
@@ -38,5 +38,10 @@ To run:
 2. ` FTP_BUCKET ` = S3 bucket where ftp/sftp users data will be stored.
 3. ` CONFIG_BUCKET ` = S3 bucket where the config data (env.list file) will be stored.
 4. ` IAM_ROLE ` = name of role account linked to EC2 instance the container is running in.
+
+## TODO
+
+- [ ] Install fail2ban
+  - This requires more mounting the logs on the host
 
 **Enjoy!**

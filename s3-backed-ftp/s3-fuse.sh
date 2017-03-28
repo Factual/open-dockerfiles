@@ -41,7 +41,7 @@ fi
 if [ -n "$PASV_ADDRESS" ]; then
   info "Using PASV_ADDRESS environment varialbe"
   sed -i "s/^pasv_address=.*/pasv_address=$PASV_ADDRESS/" /etc/vsftpd.conf
-  info "Set PASV_ADDRESS to : $IP"
+  info "Set PASV_ADDRESS to : $PASV_ADDRESS"
 elif curl -s http://instance-data > /dev/null ; then
   info "Trying to get passive address from EC2 metadata"
   IP=$(curl -s http://instance-data/latest/meta-data/public-ipv4)
@@ -51,7 +51,6 @@ else
   fatal "You need to set PASV_ADDRESS environment variable, or run in an EC2 instance. Aborting!"
 fi
 
-# start s3 fuse
 if [ ! -d "$MOUNT_POINT" ]; then
   mkdir -p "$MOUNT_POINT"
 fi
@@ -59,4 +58,4 @@ fi
 # umask=0022 so $MOUNT_POINT and everything under $MOUNT_POINT has permissions
 #   Files:        644
 #   Directories:  755
-/usr/local/bin/s3fs "$FTP_BUCKET" "$MOUNT_POINT" -o "iam_role=$IAM_ROLE,allow_other,nodev,nonempty,mp_umask=0022,umask=0022,stat_cache_expire=600" #-d -d -f -o f2 -o curldbg
+# /usr/local/bin/s3fs "$FTP_BUCKET" "$MOUNT_POINT" -o "iam_role=$IAM_ROLE,allow_other,nodev,nonempty,mp_umask=0022,umask=0022,stat_cache_expire=600" #-d -d -f -o f2 -o curldbg

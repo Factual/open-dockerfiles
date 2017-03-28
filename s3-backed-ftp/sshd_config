@@ -19,8 +19,10 @@ Subsystem sftp internal-sftp
 ForceCommand internal-sftp
 
 Match Group ftpaccess
-    PasswordAuthentication yes
     ChrootDirectory %h
+    PasswordAuthentication yes
+    AuthorizedKeysFile %h/.ssh/authorized_keys
     X11Forwarding no
     AllowTcpForwarding no
-    ForceCommand internal-sftp -u 027
+    PermitTunnel no
+    ForceCommand internal-sftp -u 022

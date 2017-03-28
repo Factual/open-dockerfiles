@@ -11,7 +11,6 @@ ARG VERSION="v1.80"
 RUN apk add --update --no-cache ${BUILD_DEPS} \
   && git clone https://github.com/s3fs-fuse/s3fs-fuse.git \
   && cd s3fs-fuse \
-  && git checkout tags/${VERSION} \
   && ./autogen.sh \
   && ./configure  \
   && make         \
@@ -35,5 +34,6 @@ COPY [ "s3-fuse.sh", "entrypoint.sh", "add_users_in_container.sh", "/home/superv
 EXPOSE 21 22
 
 # Run supervisord at container start
+ENV MOUNT_POINT /home/aws/s3bucket
 ENTRYPOINT [ "/home/supervisor/entrypoint.sh" ]
-CMD [ "/usr/bin/supervisord" ]
+CMD [ "/usr/bin/supervisord" , "-c", "/home/supervisor/supervisord.conf" ]

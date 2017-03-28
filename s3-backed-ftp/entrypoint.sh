@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# IFS=$'\n\t'
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 FTP_GROUP=${FTP_GROUP:-"ftpaccess"}
@@ -17,7 +16,7 @@ initial_setup() {
   getent group "$FTP_GROUP" || addgroup "$FTP_GROUP"
 
   chown supervisor:supervisor /home/supervisor/supervisord.conf
-  chmod 750 /home/supervisor/*
+  chmod 755 /home/supervisor/*
 
   # Generate unique ssh keys for this container, if needed
   if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
@@ -27,9 +26,6 @@ initial_setup() {
       ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
   fi
 
-  # Mount the s3 bucket before creating files under the ftp-directory
-  /home/supervisor/s3-fuse.sh
-
   mkdir -p $FTP_DIRECTORY
   chown root:root $FTP_DIRECTORY
   chmod 755 $FTP_DIRECTORY
@@ -38,9 +34,9 @@ initial_setup() {
 fix_existing_permissions() {
   # Directory exists but permissions for it have to be setup anyway.
   chown "root:$FTP_GROUP" "$FTP_DIRECTORY/$1"
-  chmod 750 "$FTP_DIRECTORY/$1"
+  chmod 755 "$FTP_DIRECTORY/$1"
   chown "$1:$FTP_GROUP" "$FTP_DIRECTORY/$1/files"
-  chmod 750 "$FTP_DIRECTORY/$1/files"
+  chmod 755 "$FTP_DIRECTORY/$1/files"
 }
 
 create_ssh_folder() {
@@ -54,18 +50,18 @@ create_ssh_folder() {
   chown "$1" "$FTP_DIRECTORY/$username/.ssh/authorized_keys"
 }
 
-create_new_user() {
+create_new_user_directories() {
   info "Creating '$1' directories..."
 
   # Root must own all directories leading up to and including users home directory
   mkdir -p "$FTP_DIRECTORY/$1"
   chown "root:$FTP_GROUP" "$FTP_DIRECTORY/$1"
-  chmod 750 "$FTP_DIRECTORY/$1"
+  chmod 755 "$FTP_DIRECTORY/$1"
 
   # Need files sub-directory for SFTP chroot
   mkdir -p "$FTP_DIRECTORY/$1/files"
   chown "$1:$FTP_GROUP" "$FTP_DIRECTORY/$1/files"
-  chmod 750 "$FTP_DIRECTORY/$1/files"
+  chmod 755 "$FTP_DIRECTORY/$1/files"
 
   create_ssh_folder "$1"
 
@@ -79,17 +75,17 @@ add_users() {
     # By replacing the ':' with a space
     read -r username passwd <<< "${u//:/ }"
 
-    adduser -D -h "$FTP_DIRECTORY/$username" -s "/sbin/nologin" "$username" || fatal "Failed to create $username"
-    adduser "$username" "$FTP_GROUP" || fatal "Failed to add $username to $FTP_GROUP group"
-
-    # set the users password
-    echo "$u" | chpasswd -e
-
     if [ -z "$username" ] || [ -z "$passwd" ]; then
       warning "Invalid username:password combination '$u': please fix to create '$username'"
       continue
+    elif ! getent passwd "$username" > /dev/null 2>&1; then
+      adduser -D -h "$FTP_DIRECTORY/$username" -s "/sbin/nologin" "$username" || fatal "Failed to create $username"
+      adduser "$username" "$FTP_GROUP" || fatal "Failed to add $username to $FTP_GROUP group"
+
+      # set the users password
+      echo "$u" | chpasswd -e
     elif [ -d "$FTP_DIRECTORY/$username" ] && [ -d "$FTP_DIRECTORY/$username/files" ]; then
-      info "Skipping creation of '$username' directory: already exists"
+      info "Skipping creation of '$username' user: already exists"
       info "Making sure existing permissions are correct..."
 
       # Directory exists but permissions for it have to be setup anyway.
@@ -98,7 +94,7 @@ add_users() {
       # Create .ssh folder and authorized_keys file, for ssh-key sftp access
       create_ssh_folder "$username"
     else
-      create_new_user "$username"
+      create_new_user_directories "$username"
     fi
 
   done
@@ -106,3 +102,5 @@ add_users() {
 
 initial_setup
 add_users
+
+exec "$@"
