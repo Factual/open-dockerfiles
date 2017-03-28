@@ -6,7 +6,7 @@ FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 FTP_GROUP=${FTP_GROUP:-"ftpaccess"}
 
 # Log to the running users home directory
-readonly LOG_FILE="/var/log/$(basename "$0").log"
+readonly LOG_FILE="/var/log/$(basename "$0" ".sh").log"
 info()    { echo "[INFO]    $*" | tee -a "$LOG_FILE" >&2 ; }
 warning() { echo "[WARNING] $*" | tee -a "$LOG_FILE" >&2 ; }
 fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
@@ -14,21 +14,30 @@ fatal()   { echo "[FATAL]   $*" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
 # Create a directory where all ftp/sftp users home directories will go
 initial_setup() {
   # Create a group for ftp users
-  addgroup "$FTP_GROUP"
-  # echo "/usr/sbin/nologin" >> /etc/shells
+  getent group "$FTP_GROUP" || addgroup "$FTP_GROUP"
 
   chown supervisor:supervisor /home/supervisor/supervisord.conf
-  chown vsftp /etc/vsftpd.conf
   chmod 750 /home/supervisor/*
+
+  # Generate unique ssh keys for this container, if needed
+  if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
+      ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
+  fi
+  if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then
+      ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
+  fi
+
+  # Mount the s3 bucket before creating files under the ftp-directory
+  /home/supervisor/s3-fuse.sh
 
   mkdir -p $FTP_DIRECTORY
   chown root:root $FTP_DIRECTORY
-  chmod 750 $FTP_DIRECTORY
+  chmod 755 $FTP_DIRECTORY
 }
 
 fix_existing_permissions() {
   # Directory exists but permissions for it have to be setup anyway.
-  chown "root:FTP_GROUP" "$FTP_DIRECTORY/$1"
+  chown "root:$FTP_GROUP" "$FTP_DIRECTORY/$1"
   chmod 750 "$FTP_DIRECTORY/$1"
   chown "$1:$FTP_GROUP" "$FTP_DIRECTORY/$1/files"
   chmod 750 "$FTP_DIRECTORY/$1/files"

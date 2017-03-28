@@ -23,22 +23,25 @@ fix_permissions() {
 
   warning "Fixing permissions for $1"
 
+  find "$FTP_DIRECTORY/$1/files/" -type f -perm 000 -exec chmod "$FILE_PERMISSIONS" {} \;
+  find "$FTP_DIRECTORY/$1/files/" -type d -perm 000 -exec chmod "$DIRECTORY_PERMISSIONS" {} \;
+  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \! -user "$1" -exec chown "$1:$1" {} +;
   # Search for files and directories not owned correctly
-  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \( \! -user "$1" \! -group "$1" \) -print0 | xargs -0 -r chown "$1:$1"
+  #find "$FTP_DIRECTORY/$1/files/" -mindepth 1 \( \! -user "$1" \! -group "$1" \) -print0 | xargs -0 -r chown "$1:$1"
 
   # Search for files with incorrect permissions
-  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 -r chmod "$FILE_PERMISSIONS"
+  # find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type f \! -perm "$FILE_PERMISSIONS" -print0 | xargs -0 -r chmod "$FILE_PERMISSIONS"
 
   # Search for directories with incorrect permissions
-  find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
-  find "$FTP_DIRECTORY/$1/files/" -maxdepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
+  # find "$FTP_DIRECTORY/$1/files/" -mindepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
+  # find "$FTP_DIRECTORY/$1/files/" -maxdepth 1 -type d \! -perm "$DIRECTORY_PERMISSIONS" -print0 | xargs -0 -r chmod "$DIRECTORY_PERMISSIONS"
 
   # Search for .ssh folders and authorized_keys files with incorrect permissions/ownership
-  find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -perm 700 -print0 | xargs -0 -r chmod 700
-  find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -user "$1" -print0 | xargs -0 -r chown "$1"
+  # find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -perm 700 -print0 | xargs -0 -r chmod 700
+  # find "$FTP_DIRECTORY/$1/.ssh" -mindepth 1 -type d \! -user "$1" -print0 | xargs -0 -r chown "$1"
 
-  find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -perm 600 -print0 | xargs -0 -r chmod 600
-  find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -user "$1" -print0 | xargs -0 -r chown "$1"
+  # find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -perm 600 -print0 | xargs -0 -r chmod 600
+  # find "$FTP_DIRECTORY/$1/.ssh/authorized_keys" -mindepth 1 -type f \! -user "$1" -print0 | xargs -0 -r chown "$1"
 }
 
 create_user() {
