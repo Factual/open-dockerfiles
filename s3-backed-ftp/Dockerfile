@@ -25,7 +25,7 @@ RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
     ./autogen.sh && \
     ./configure  && \ 
     make && \
-    sudo make install
+    make install
 
 RUN mkdir -p /home/aws/s3bucket/
 
