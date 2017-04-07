@@ -41,7 +41,7 @@ To run:
 
 ## TODO
 
-- [ ] Install fail2ban
+- [ ] Use fail2ban on the EC2 instance running this container
   - This requires more mounting the logs on the host
 
-**Enjoy!**
+### **Enjoy!**
