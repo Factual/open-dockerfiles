@@ -17,14 +17,15 @@ RUN apt-get -y update && apt-get -y install --no-install-recommends \
  supervisor \
  && rm -rf /var/lib/apt/lists/*
  
-RUN pip3 install awscli
+RUN pip3 install --upgrade pip setuptools && \ 
+ pip3 install awscli
 
 RUN git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
     cd s3fs-fuse && \
     ./autogen.sh && \
     ./configure  && \ 
     make && \
-    sudo make install
+    make install
 
 RUN mkdir -p /home/aws/s3bucket/
 
