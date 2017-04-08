@@ -3,6 +3,7 @@ set -euo pipefail
 
 FTP_DIRECTORY="/home/aws/s3bucket/ftp-users"
 FTP_GROUP=${FTP_GROUP:-"ftpaccess"}
+PASV_ADDRESS=${PASV_ADDRESS:-}
 
 # Log to the running users home directory
 readonly LOG_FILE="/var/log/$(basename "$0" ".sh").log"
@@ -26,9 +27,26 @@ initial_setup() {
       ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N ''
   fi
 
+  setup_passive_address
+
   mkdir -p $FTP_DIRECTORY
   chown root:root $FTP_DIRECTORY
   chmod 755 $FTP_DIRECTORY
+}
+
+setup_passive_address() {
+  if [ -n "$PASV_ADDRESS" ]; then
+    info "Using PASV_ADDRESS environment variable"
+    sed -i "s/^pasv_address=.*/pasv_address=$PASV_ADDRESS/" /etc/vsftpd.conf
+    info "Set PASV_ADDRESS to : $PASV_ADDRESS"
+  elif curl -s http://instance-data > /dev/null ; then
+    info "Trying to get passive address from EC2 metadata"
+    IP=$(curl -s http://instance-data/latest/meta-data/public-ipv4)
+    sed -i "s/^pasv_address=.*/pasv_address=$IP/" /etc/vsftpd.conf
+    info "Set PASV_ADDRESS to: $IP"
+  else
+    fatal "You need to set PASV_ADDRESS environment variable, or run in an EC2 instance. Aborting!"
+  fi
 }
 
 fix_existing_permissions() {

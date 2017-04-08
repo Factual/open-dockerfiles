@@ -11,7 +11,6 @@ FTP_BUCKET=${FTP_BUCKET:-}
 IAM_ROLE=${IAM_ROLE:-}
 AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
 AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
-PASV_ADDRESS=${PASV_ADDRESS:-}
 MOUNT_POINT=${MOUNT_POINT:-"/home/aws/s3bucket"}
 
 # Make sure these variables are not zero-length
@@ -36,19 +35,6 @@ if [ -z "$IAM_ROLE" ] && [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS
   #set the aws access credentials from environment variables
   echo "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY" > ~/.passwd-s3fs
   chmod 600 ~/.passwd-s3fs
-fi
-
-if [ -n "$PASV_ADDRESS" ]; then
-  info "Using PASV_ADDRESS environment varialbe"
-  sed -i "s/^pasv_address=.*/pasv_address=$PASV_ADDRESS/" /etc/vsftpd.conf
-  info "Set PASV_ADDRESS to : $PASV_ADDRESS"
-elif curl -s http://instance-data > /dev/null ; then
-  info "Trying to get passive address from EC2 metadata"
-  IP=$(curl -s http://instance-data/latest/meta-data/public-ipv4)
-  sed -i "s/^pasv_address=.*/pasv_address=$IP/" /etc/vsftpd.conf
-  info "Set PASV_ADDRESS to: $IP"
-else
-  fatal "You need to set PASV_ADDRESS environment variable, or run in an EC2 instance. Aborting!"
 fi
 
 if [ ! -d "$MOUNT_POINT" ]; then

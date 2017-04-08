@@ -1,7 +1,7 @@
 .PHONY: build push run
 
 build:
-	@docker build -f Dockerfile.alpine --rm -t factual/s3-backed-ftp:alpine .
+	@docker build -f Dockerfile --rm -t factual/s3-backed-ftp:alpine .
 
 push:
 	@docker push factual/s3-backed-ftp:alpine
