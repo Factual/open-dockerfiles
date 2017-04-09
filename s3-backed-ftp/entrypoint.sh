@@ -17,7 +17,7 @@ initial_setup() {
   getent group "$FTP_GROUP" || addgroup "$FTP_GROUP"
 
   chown supervisor:supervisor /home/supervisor/supervisord.conf
-  chmod 755 /home/supervisor/*
+  chmod 750 /home/supervisor/*.sh
 
   # Generate unique ssh keys for this container, if needed
   if [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
@@ -32,6 +32,8 @@ initial_setup() {
   mkdir -p $FTP_DIRECTORY
   chown root:root $FTP_DIRECTORY
   chmod 755 $FTP_DIRECTORY
+
+  mkdir -p /tmp/s3fscache || fatal "Failed to create s3fs cache directory"
 }
 
 setup_passive_address() {

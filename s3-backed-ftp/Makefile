@@ -3,7 +3,7 @@
 build:
 	@docker build -f Dockerfile --rm -t factual/s3-backed-ftp:alpine .
 
-push:
+push: build
 	@docker push factual/s3-backed-ftp:alpine
 
 run: build

@@ -7,10 +7,12 @@ ARG BUILD_DEPS="alpine-sdk automake autoconf curl-dev fuse fuse-dev git libcurl 
 ARG CAN_DELETE="alpine-sdk automake autoconf curl-dev fuse-dev git libxml2-dev"
 ARG RUN_DEPS="bash curl inotify-tools openssh openssh-sftp-server py-pip supervisor vsftpd"
 ARG VERSION="v1.80"
+ARG COMMIT="d748b333ee1d35f68f5e1f490de33dddd6c9aa41"
 
 RUN apk add --update --no-cache ${BUILD_DEPS} \
   && git clone https://github.com/s3fs-fuse/s3fs-fuse.git \
   && cd s3fs-fuse \
+  && git checkout ${COMMIT} \
   && ./autogen.sh \
   && ./configure  \
   && make         \
