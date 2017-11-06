@@ -18,6 +18,8 @@ RUN apt-get -y update && apt-get -y install --no-install-recommends \
  supervisor \
  && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install -U setuptools pip
+
 # Run commands to set-up everything
 RUN pip3 install awscli && \
   git clone https://github.com/s3fs-fuse/s3fs-fuse.git && \
@@ -25,7 +27,7 @@ RUN pip3 install awscli && \
   ./autogen.sh && \
   ./configure  && \
   make && \
-  sudo make install && \
+  make install && \
   mkdir -p /home/aws/s3bucket/ && \
   echo "/usr/sbin/nologin" >> /etc/shells
 
