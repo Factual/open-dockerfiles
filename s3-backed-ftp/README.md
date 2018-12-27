@@ -14,7 +14,7 @@ To run:
      - You may also use non-hashed passwords if storing passwords in plaintext is fine. To do this, change line ` echo $u | chpasswd -e ` => ` echo $u | chpasswd ` in the `users.sh` file (line #24).
     - Specify the S3 buckets were the files (`FTP_BUCKET`) and configs (`CONFIG_BUCKET`) will be stored.
     - If you are running this container inside an AWS EC2 Instance with an assigned IAM_ROLE, then specify its name in the `IAM_ROLE` environment variable.
-    - If you do not have an IAM_ROLE attached to your EC2 Instance or wherever you are running this, then you have to specify the AWS credentials that will be used to access S3. These are the `AWS_ACCESS_KEY_ID` and the `AWS_SECRET_KEY_ID` keys.
+    - If you do not have an IAM_ROLE attached to your EC2 Instance or wherever you are running this, then you have to specify the AWS credentials that will be used to access S3. These are the `AWS_ACCESS_KEY_ID` and the `AWS_SECRET_ACCESS_KEY` keys.
 
 2. If you have changed other files aside the `env.list` file, then you have to build the docker container using:
 
